@@ -34,12 +34,16 @@ jobs:
           echo $current_branch
           #--- debug
           # ensure entire history of the github branch is there, as opposed to a shallow clone
+          git branch origin_branch origin/$current_branch
+          git checkout origin_branch
           git reset --hard origin/$current_branch
           # checkout bioc branch and inspect
           git branch bioc_branch bioc/$current_branch
           git checkout bioc_branch
-          git log -10 --oneline
-          git log bioc_branch..$current_branch --pretty=format:"%s"
+          git reset --hard bioc/$current_branch
+          # compare
+          git log bioc_branch..origin_branch --pretty=format:"%s"
+          git log origin_branch..bioc_branch --pretty=format:"%s"
           #--- fetch & push
           git push bioc $current_branch:$current_branch
         env:
