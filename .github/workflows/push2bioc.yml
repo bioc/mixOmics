@@ -52,6 +52,15 @@ jobs:
           SSH_KEY: ${{ secrets.PRIVATE_SSH_KEY_AL }}
           BIOC_HOST: ${{ secrets.BIOC_HOST }}
 
+      - name: Create Pull Request Of Latest Bioc
+        if: failure()
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: RELEASE_3_13
+          # base: ${{ github.ref_name }}
+          branch: bioc_${{ github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@master
