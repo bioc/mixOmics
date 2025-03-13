@@ -6,6 +6,7 @@ on:
     branches:
       - master
   workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch:  # Allow manual triggers
   schedule:
     - cron: '0 8 * * 4'
 
@@ -79,6 +80,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
+          - { os: windows-latest, r: '${{ needs.versions.outputs.r }}', bioc: '${{ needs.versions.outputs.bioc }}'}
+          - { os: macOS-latest, r: '${{ needs.versions.outputs.r }}', bioc: '${{ needs.versions.outputs.bioc }}'}
           - { os: windows-latest, r: '${{ needs.versions.outputs.r }}', bioc: '${{ needs.versions.outputs.bioc }}'}
           - { os: macOS-latest, r: '${{ needs.versions.outputs.r }}', bioc: '${{ needs.versions.outputs.bioc }}'}
           - { os: ubuntu-latest, r: '${{ needs.versions.outputs.r }}', bioc: '${{ needs.versions.outputs.bioc }}', image: 'bioconductor/bioconductor_docker:${{ needs.versions.outputs.bioc }}'}
@@ -160,7 +163,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y qpdf
+          sudo apt-get update
+          sudo apt-get install -y pandoc-citeproc
+          sudo apt-get install -y qpdf
 
+      - name: Install R dependencies 🔨
       - name: Install R dependencies 🔨
         run: |
           options(repos = c(CRAN = "https://cran.r-project.org"))
@@ -176,6 +183,7 @@ jobs:
           sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
 
+        # runs rmdcheck, first runs 'devtools::install to make sure there is a copy of mixOmics the parallel workers can access'
         # runs rmdcheck, first runs 'devtools::install to make sure there is a copy of mixOmics the parallel workers can access'
       - name: Check ✅ 
         if: (!contains(github.event.head_commit.message, 'skip-check'))
@@ -194,8 +202,12 @@ jobs:
 
       - name: Check --as-cran ✅ ✅ 
         if: (github.event_name == 'schedule' && github.repository == 'mixOmicsTeam/mixOmics') || (github.event_name == 'workflow_dispatch' && github.repository == 'mixOmicsTeam/mixOmics')
+        if: (github.event_name == 'schedule' && github.repository == 'mixOmicsTeam/mixOmics') || (github.event_name == 'workflow_dispatch' && github.repository == 'mixOmicsTeam/mixOmics')
         env:
           _R_CHECK_CRAN_INCOMING_: false
+        run: |
+          options(devtools.check.dir = "check/asCRAN", devtools.check.warning = "never")
+          devtools::check(args = c("--no-manual", "--as-cran", "--ignore-vignettes", "--run-dontrun"), build_args = c("--no-build-vignettes"))
         run: |
           options(devtools.check.dir = "check/asCRAN", devtools.check.warning = "never")
           devtools::check(args = c("--no-manual", "--as-cran", "--ignore-vignettes", "--run-dontrun"), build_args = c("--no-build-vignettes"))
@@ -214,6 +226,7 @@ jobs:
         shell: bash
 
       - name: Push to DockerHub 📦
+        if: runner.os == 'Linux' && needs.versions.outputs.dockerise == 'true' && !contains(github.event.head_commit.message, 'skip-docker')
         if: runner.os == 'Linux' && needs.versions.outputs.dockerise == 'true' && !contains(github.event.head_commit.message, 'skip-docker')
         uses: docker/build-push-action@v1
         with:
