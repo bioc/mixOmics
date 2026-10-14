@@ -92,7 +92,7 @@ line.
 2)  Pull mixOmics container
 
 ``` bash
-docker pull mixomicsteam/mixomics
+docker pull mixomicsteam/mixomics:github
 ```
 
 3)  Ensure it is installed
@@ -108,7 +108,7 @@ to the following:
 
     $ docker images 
       > REPOSITORY                       TAG       IMAGE ID       CREATED         SIZE
-      > mixomicsteam/mixomics            latest    e755393ac247   2 weeks ago     4.38GB
+      > mixomicsteam/mixomics            github    e755393ac247   2 weeks ago     4.38GB
 
 4)  Activate the container
 
@@ -119,7 +119,7 @@ ports (8787:8787) if desired/necessary. see
 details.
 
 ``` bash
-docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics
+docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics:github
 ```
 
 5)  Run
@@ -142,8 +142,8 @@ The output should be something similar to the following:
 
 ``` bash
 $ sudo docker ps
-  > CONTAINER ID   IMAGE                   COMMAND   CREATED         STATUS         PORTS                    NAMES
-  > f14b0bc28326   mixomicsteam/mixomics   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
+  > CONTAINER ID   IMAGE                          COMMAND   CREATED         STATUS         PORTS                    NAMES
+  > f14b0bc28326   mixomicsteam/mixomics:github   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
 ```
 
 The listed image ID can then be used to stop the container (here
