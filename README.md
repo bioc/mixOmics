@@ -3,17 +3,17 @@
 
 [![download](http://www.bioconductor.org/shields/downloads/release/mixOmics.svg)](https://bioconductor.org/packages/stats/bioc/mixOmics)
 [![R build
-status](https://github.com/mixOmicsteam/mixOmics/workflows/R-CMD-check.yml/badge.svg)](https://github.com/mixOmicsteam/mixOmics/actions)
-[![](https://img.shields.io/github/last-commit/mixOmicsTeam/mixOmics.svg)](https://github.com/mixOmicsTeam/mixOmics/commits/master)
-[![](https://codecov.io/gh/mixOmicsTeam/mixOmics/branch/master/graph/badge.svg)](https://app.codecov.io/gh/mixOmicsTeam/mixOmics)
+status](https://github.com/mixOmics-org/mixOmics/workflows/R-CMD-check.yml/badge.svg)](https://github.com/mixOmics-org/mixOmics/actions)
+[![](https://img.shields.io/github/last-commit/mixOmics-org/mixOmics.svg)](https://github.com/mixOmics-org/mixOmics/commits/master)
+[![](https://codecov.io/gh/mixOmics-org/mixOmics/branch/master/graph/badge.svg)](https://app.codecov.io/gh/mixOmics-org/mixOmics)
 [![license](https://img.shields.io/badge/license-GPL%20(%3E=%202)-lightgrey.svg)](https://choosealicense.com/)
 [![dependencies](http://bioconductor.org/shields/dependencies/release/mixOmics.svg)](http://bioconductor.org/packages/release/bioc/html/mixOmics.html#since)
 
-![](http://mixomics.org/wp-content/uploads/2019/07/MixOmics-Logo-1.png)
+![](https://raw.githubusercontent.com/mixOmics-org/.github/main/profile/assets/mixomics-logo.svg)
 
 This repository contains the `R` package which is [hosted on
 Bioconductor](http://bioconductor.org/packages/release/bioc/html/mixOmics.html)
-and our development `GitHub` versions. Go to www.mixomics.org for
+and our development `GitHub` versions. Go to <https://mixomics.org> for
 information on how to use mixOmics.
 
 ## Installation
@@ -55,7 +55,7 @@ testing.
 install.packages("devtools")
 
 ## install latest github version of mixOmics
-devtools::install_github("mixOmicsTeam/mixOmics")
+devtools::install_github("mixOmics-org/mixOmics")
 ```
 
 ### From Docker container
@@ -92,7 +92,7 @@ line.
 2)  Pull mixOmics container
 
 ``` bash
-docker pull mixomicsteam/mixomics
+docker pull mixomicsteam/mixomics:github
 ```
 
 3)  Ensure it is installed
@@ -108,7 +108,7 @@ to the following:
 
     $ docker images 
       > REPOSITORY                       TAG       IMAGE ID       CREATED         SIZE
-      > mixomicsteam/mixomics            latest    e755393ac247   2 weeks ago     4.38GB
+      > mixomicsteam/mixomics            github    e755393ac247   2 weeks ago     4.38GB
 
 4)  Activate the container
 
@@ -119,7 +119,7 @@ ports (8787:8787) if desired/necessary. see
 details.
 
 ``` bash
-docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics
+docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics:github
 ```
 
 5)  Run
@@ -142,8 +142,8 @@ The output should be something similar to the following:
 
 ``` bash
 $ sudo docker ps
-  > CONTAINER ID   IMAGE                   COMMAND   CREATED         STATUS         PORTS                    NAMES
-  > f14b0bc28326   mixomicsteam/mixomics   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
+  > CONTAINER ID   IMAGE                          COMMAND   CREATED         STATUS         PORTS                    NAMES
+  > f14b0bc28326   mixomicsteam/mixomics:github   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
 ```
 
 The listed image ID can then be used to stop the container (here
@@ -158,7 +158,7 @@ docker stop f14b0bc28326
 ## Contribution
 
 We welcome community contributions concordant with [our code of
-conduct](https://github.com/mixOmicsTeam/mixOmics/blob/master/CODE_OF_CONDUCT.md).
+conduct](https://github.com/mixOmics-org/mixOmics/blob/master/CODE_OF_CONDUCT.md).
 We strongly recommend adhering to [Bioconductor’s coding
 guide](https://bioconductor.org/developers/how-to/coding-style/) for
 software consistency if you wish to contribute to `mixOmics` R codes.
@@ -216,7 +216,27 @@ Thank you!
 
 ## What’s New
 
+#### May 2026
+
+- bug fix implemented for
+  [\#377](https://github.com/mixOmicsTeam/mixOmics/issues/377) fixed
+  vector `xlim` handling in the `graphics` branch of `plotLoadings()`
+  contribution plots
+- enhancement request
+  [\#381](https://github.com/mixOmicsTeam/mixOmics/issues/381) expanded
+  test coverage for model utilities and internal helper paths, with
+  small fixes made for issues exposed by the new tests
+
 #### April 2026
+
+\*\* Version 6.36.0 \*\*
+
+[Bioconductor release version
+6.36.0](https://www.bioconductor.org/packages/release/bioc/html/mixOmics.html)
+released 29th April 2026 mixOmics can now be downloaded using
+[Bioconductor version
+3.23](https://bioconductor.org/news/bioc_3_23_release/) and is
+compatible with R 4.6.0
 
 - bug fix implemented for
   [\#374](https://github.com/mixOmicsTeam/mixOmics/issues/374) replaced
@@ -235,7 +255,7 @@ Thank you!
 released 17th April 2025 mixOmics can now be downloaded using
 [Bioconductor version
 3.21](https://bioconductor.org/news/bioc_3_21_release/) and is
-compatable with R 4.5.0
+compatible with R 4.5.0
 
 - feature request
   [\#345](https://github.com/mixOmicsTeam/mixOmics/issues/345) updated

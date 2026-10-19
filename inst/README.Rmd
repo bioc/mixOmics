@@ -34,15 +34,15 @@ pkg_license_badge <- sprintf("https://img.shields.io/badge/license-%s-lightgrey.
 ```
 
 `r badge_bioc_download_rank('mixOmics')`
-`r badge_github_actions(re = "mixOmicsteam/mixOmics", action = "R-CMD-check.yml")`
-`r badge_last_commit("mixOmicsTeam/mixOmics", branch='master')`
-`r badge_codecov("mixOmicsTeam/mixOmics", branch='master')`
+`r badge_github_actions(re = "mixOmics-org/mixOmics", action = "R-CMD-check.yml")`
+`r badge_last_commit("mixOmics-org/mixOmics", branch='master')`
+`r badge_codecov("mixOmics-org/mixOmics", branch='master')`
 [![license](`r pkg_license_badge`)](https://choosealicense.com/)
 [![dependencies](http://bioconductor.org/shields/dependencies/release/mixOmics.svg)](http://bioconductor.org/packages/release/bioc/html/mixOmics.html#since)
 
-![](http://mixomics.org/wp-content/uploads/2019/07/MixOmics-Logo-1.png)
+![](https://raw.githubusercontent.com/mixOmics-org/.github/main/profile/assets/mixomics-logo.svg)
 
-This repository contains the `R` package which is [hosted on Bioconductor](http://bioconductor.org/packages/release/bioc/html/mixOmics.html) and our development `GitHub` versions. Go to www.mixomics.org for information on how to use mixOmics. 
+This repository contains the `R` package which is [hosted on Bioconductor](http://bioconductor.org/packages/release/bioc/html/mixOmics.html) and our development `GitHub` versions. Go to https://mixomics.org for information on how to use mixOmics. 
 
 ## Installation
 
@@ -73,7 +73,7 @@ Bioconductor versions are updated twice a year, between these updates you can do
 install.packages("devtools")
 
 ## install latest github version of mixOmics
-devtools::install_github("mixOmicsTeam/mixOmics")
+devtools::install_github("mixOmics-org/mixOmics")
 ```
 
 ### From Docker container
@@ -100,7 +100,7 @@ Then open your system's command line interface (e.g. Terminal for MacOS and Comm
 2) Pull mixOmics container
 
 ```bash
-docker pull mixomicsteam/mixomics
+docker pull mixomicsteam/mixomics:github
 ```
 
 3) Ensure it is installed
@@ -114,14 +114,14 @@ This lists the installed images. The output should be something similar to the f
 ```
 $ docker images 
   > REPOSITORY                       TAG       IMAGE ID       CREATED         SIZE
-  > mixomicsteam/mixomics            latest    e755393ac247   2 weeks ago     4.38GB
+  > mixomicsteam/mixomics            github    e755393ac247   2 weeks ago     4.38GB
 ```
 4) Activate the container
 
 Running the following command activates the container. You must change `your_password` to a custom password of your own. You can also customise ports (8787:8787) if desired/necessary. see https://docs.docker.com/config/containers/container-networking/ for details.
 
 ```bash
-docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics
+docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics:github
 ```
 
 5) Run
@@ -142,8 +142,8 @@ sudo docker ps
 The output should be something similar to the following:
 ```bash
 $ sudo docker ps
-  > CONTAINER ID   IMAGE                   COMMAND   CREATED         STATUS         PORTS                    NAMES
-  > f14b0bc28326   mixomicsteam/mixomics   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
+  > CONTAINER ID   IMAGE                          COMMAND   CREATED         STATUS         PORTS                    NAMES
+  > f14b0bc28326   mixomicsteam/mixomics:github   "/init"   7 minutes ago   Up 7 minutes   0.0.0.0:8787->8787/tcp   compassionate_mestorf
 ```
 The listed image ID can then be used to stop the container (here `f14b0bc28326`)
 ```bash
@@ -155,7 +155,7 @@ docker stop f14b0bc28326
 
 ## Contribution
 
-We welcome community contributions concordant with [our code of conduct](https://github.com/mixOmicsTeam/mixOmics/blob/master/CODE_OF_CONDUCT.md). We strongly recommend adhering to [Bioconductor's coding guide](https://bioconductor.org/developers/how-to/coding-style/) for software consistency if you wish to contribute to `mixOmics` R codes.
+We welcome community contributions concordant with [our code of conduct](https://github.com/mixOmics-org/mixOmics/blob/master/CODE_OF_CONDUCT.md). We strongly recommend adhering to [Bioconductor's coding guide](https://bioconductor.org/developers/how-to/coding-style/) for software consistency if you wish to contribute to `mixOmics` R codes.
 
 ### Bug reports and pull requests
 
