@@ -117,6 +117,68 @@ test_that("(predict:edge.case): tied block weights", code = {
 })
 
 
+test_that("(.weighted_predict:basic): blocks with the same prediction add up their weights", code = {
+    # 2 samples x 2 responses x 3 blocks. Cell [1, 1]: block 1 gives 1, blocks 2
+    # and 3 give 5; cell [2, 1]: blocks 1 and 2 give 2; cell [2, 2]: all give 8
+    x <- array(c(1, 2, 3, 8,
+                 5, 2, 4, 8,
+                 5, 7, 9, 8), c(2, 2, 3))
+    # cell [1, 1]: 0.3 + 0.3 for the 5 against 0.5 for the 1
+    expect_equal(.weighted_predict(x, c(0.5, 0.3, 0.3)), matrix(c(5, 2, 3, 8), 2))
+    # cell [1, 1]: 0.7 for the 1 against 0.3 + 0.3 for the 5
+    expect_equal(.weighted_predict(x, c(0.7, 0.3, 0.3)), matrix(c(1, 2, 3, 8), 2))
+    # cell [1, 1]: 0.6 for the 1 ties with 0.3 + 0.3 for the 5
+    expect_equal(.weighted_predict(x, c(0.6, 0.3, 0.3)), matrix(c(NA, 2, 3, 8), 2))
+    # a tie in every cell gives a logical NA matrix
+    expect_identical(.weighted_predict(array(c(1, 2, 3, 4), c(2, 1, 2)), c(0.5, 0.5)),
+                     matrix(NA, 2, 1))
+})
+
+
+test_that("(.weighted_predict:basic): matches a vote computed with sum() in each cell", code = {
+    # random predictions with NA; block 1 gives a prediction in every cell
+    set.seed(1)
+    x <- array(sample(c(1, 2, 3, NA), 10 * 5 * 5, replace = TRUE), c(10, 5, 5))
+    x[, , 1] <- sample(1:3, 10 * 5, replace = TRUE)
+    # sums of these weights can tie, e.g. 0.2 + 0.3 and 0.5; 0.1 + 0.2 + 0.3
+    # ties with 0.6 only where sum() adds in extended precision (x86_64)
+    w <- c(0.1, 0.2, 0.3, 0.5, 0.6)
+    expected <- apply(x, c(1, 2), function(z) {
+        keep <- !is.na(z)
+        total <- tapply(w[keep], as.character(z[keep]), sum)
+        best <- names(total)[total == max(total)]
+        if (length(best) == 1) z[keep][as.character(z[keep]) == best][1] else NA
+    })
+    expect_identical(.weighted_predict(x, w), expected)
+})
+
+
+test_that("(.weighted_predict:edge.case): predictions that agree to 15 significant digits count as the same", code = {
+    # 0.1 and 0.1 + 2^-56 differ in the 17th significant digit
+    x <- array(c(0.3, 0.1, 0.1 + 2^-56), c(1, 1, 3))
+    # blocks 2 and 3 together outweigh block 1, and the value kept is that of block 2
+    expect_identical(.weighted_predict(x, c(0.5, 0.3, 0.3)), matrix(0.1))
+})
+
+
+test_that("(.weighted_predict:edge.case): blocks that give NA are left out of the vote", code = {
+    # block 2 gives NA for sample 1 and NaN for sample 2
+    x <- array(c(1, 2, 3,
+                 NA, NaN, 6), c(3, 1, 2))
+    expect_equal(.weighted_predict(x, c(0.4, 0.9)), matrix(c(1, 2, 6), 3))
+    # an NA weight gives NA where its block takes part in the vote
+    expect_equal(.weighted_predict(x, c(0.4, NA)), matrix(c(1, 2, NA), 3))
+})
+
+
+test_that("(.weighted_predict:error): every block gives NA for a cell", code = {
+    x <- array(c(1, NA,
+                 3, NA), c(2, 1, 2))
+    expect_error(.weighted_predict(x, c(0.4, 0.9)), "invalid 'type' (list) of argument",
+                 fixed = TRUE)
+})
+
+
 test_that("predict.mint.splsda works", code = {
     ## example with mint.splsda
     data(stemcells)
