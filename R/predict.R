@@ -677,43 +677,9 @@ predict.mixo_pls <-
                     
                 })), dim(Y.hat[[1]]), dimnames = list(rownames(newdata[[1]]), colnames(Y), paste0("dim", c(1:min(ncomp[-object$indY])))))
                 
+                # weighted vote over the blocks, see .weighted_predict
                 out$WeightedPredict = array(unlist(lapply(temp.all, function(x){
-                    block.weights = rowMeans(object$weights)
-                    dim.x = dim(x); n.cells = dim.x[1] * dim.x[2]; n.blocks = dim.x[3]
-                    x.mat = matrix(x, n.cells, n.blocks)
-                    valid = !is.na(x.mat)
-                    if (any(rowSums(valid) == 0L)) stop("invalid 'type' (list) of argument")
-
-                    x.char = matrix(as.character(x.mat), n.cells, n.blocks)
-                    group.weight = matrix(0, n.cells, n.blocks)
-                    for (j in seq_len(n.blocks))
-                    {
-                        same.group = x.char == x.char[, j] & valid & valid[, j]
-                        group.weight[same.group] = group.weight[same.group] + block.weights[j]
-                    }
-                    group.weight[!valid] = -Inf
-                    max.weight = apply(group.weight, 1, max)
-
-                    max.class = rep(NA_character_, n.cells); max.idx = rep(NA_integer_, n.cells)
-                    tied = rep(FALSE, n.cells)
-                    for (j in seq_len(n.blocks))
-                    {
-                        is.max = group.weight[, j] == max.weight & valid[, j]
-                        is.max[is.na(is.max)] = FALSE
-                        tied[is.max & !is.na(max.class) & max.class != x.char[, j]] = TRUE
-                        update = is.max & is.na(max.class)
-                        max.class[update] = x.char[update, j]
-                        max.idx[update] = j
-                    }
-
-                    unique.max = !tied & !is.na(max.class)
-                    if (any(unique.max)) {
-                        out.vec = x.mat[cbind(seq_len(n.cells), ifelse(is.na(max.idx), 1L, max.idx))]
-                        out.vec[!unique.max] = NA
-                    } else {
-                        out.vec = rep(NA, n.cells)
-                    }
-                    matrix(out.vec, dim.x[1], dim.x[2])
+                    .weighted_predict(x, rowMeans(object$weights))
                 })), dim(Y.hat[[1]]), dimnames = list(rownames(newdata[[1]]), colnames(Y), paste0("dim", c(1:min(ncomp[-object$indY])))))
             }
             
@@ -816,4 +782,68 @@ predict.block.pls <- predict.mixo_pls
 predict.block.spls <- predict.mixo_pls
 
 
+#' Weighted vote over the blocks
+#'
+#' For each sample and response, the blocks that give the same prediction add
+#' up their weights, and the prediction with the largest total weight is kept.
+#' The value kept is that of the first block that gives the winning prediction.
+#' Blocks that give NA for a cell are left out of its vote. A tie between
+#' different predictions gives NA, and so does an NA weight of a block that
+#' takes part in the vote.
+#'
+#' @param x numeric array of predictions, with samples, responses and blocks
+#'   in the three dimensions.
+#' @param block.weights numeric vector, one weight per block.
+#' @return matrix of the predictions kept, samples in rows and responses in
+#'   columns.
+#' @noRd
+.weighted_predict <- function(x, block.weights)
+{
+    # one row per (sample, response) cell, one column per block
+    dim.x = dim(x); n.cells = dim.x[1] * dim.x[2]; n.blocks = dim.x[3]
+    x.mat = matrix(x, n.cells, n.blocks)
+    valid = !is.na(x.mat)
+    # stop when every block gives NA for a cell
+    if (any(rowSums(valid) == 0L)) stop("invalid 'type' (list) of argument")
 
+    # predictions with the same as.character() string count as the same
+    x.char = matrix(as.character(x.mat), n.cells, n.blocks)
+    # group.weight[i, j]: total weight of the blocks that give the same
+    # prediction as block j in cell i; -Inf where block j gives NA.
+    w.mat = matrix(block.weights, n.cells, n.blocks, byrow = TRUE)
+    group.weight = matrix(0, n.cells, n.blocks)
+    for (j in seq_len(n.blocks))
+    {
+        # weights outside the group set to 0; replace() keeps an NA weight in its group
+        same.group = x.char == x.char[, j] & valid & valid[, j]
+        group.weight[, j] = rowSums(replace(w.mat, !same.group, 0))
+    }
+    group.weight[!valid] = -Inf
+    max.weight = do.call(pmax, lapply(seq_len(n.blocks), function(j) group.weight[, j]))
+
+    # the first block with the largest total weight gives the prediction;
+    # a later block with the same total weight and a different prediction
+    # marks a tie
+    max.class = rep(NA_character_, n.cells); max.idx = rep(NA_integer_, n.cells)
+    tied = rep(FALSE, n.cells)
+    for (j in seq_len(n.blocks))
+    {
+        is.max = group.weight[, j] == max.weight & valid[, j]
+        is.max[is.na(is.max)] = FALSE
+        tied[is.max & !is.na(max.class) & max.class != x.char[, j]] = TRUE
+        update = is.max & is.na(max.class)
+        max.class[update] = x.char[update, j]
+        max.idx[update] = j
+    }
+
+    # NA for a tie or an NA weight; a logical NA matrix when no cell has a
+    # single largest weight
+    unique.max = !tied & !is.na(max.class)
+    if (any(unique.max)) {
+        out.vec = x.mat[cbind(seq_len(n.cells), ifelse(is.na(max.idx), 1L, max.idx))]
+        out.vec[!unique.max] = NA
+    } else {
+        out.vec = rep(NA, n.cells)
+    }
+    matrix(out.vec, dim.x[1], dim.x[2])
+}
