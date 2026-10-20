@@ -8,7 +8,7 @@ knit: (function(inputFile, encoding) {
     rmarkdown::render(inputFile, output_file="README.md", encoding = encoding, output_dir = "../") })
 ---
 
-<!-- PLEASE DO NOT EDIT ./README.md BY HAND, EDIT ./inst/README.Rmd AND RENDER TO CREATE ./README.md -->
+<!-- PLEASE DO NOT EDIT ./README.md BY HAND, EDIT ./inst/README.Rmd AND THE RENDER README WORKFLOW CREATES ./README.md IN THE PULL REQUEST -->
 
 
 ```{r setup, include=FALSE}

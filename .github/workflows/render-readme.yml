@@ -1,0 +1,107 @@
+## Renders README.md from inst/README.Rmd inside the pull request, so that
+## every README.md is rendered on the same runner setup
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'inst/README.Rmd'
+      - 'inst/README-WhatsNew.Rmd'
+      - 'DESCRIPTION'
+      - '.github/workflows/render-readme.yml'
+  workflow_dispatch:  # renders on the selected branch
+
+name: Render README
+
+permissions:
+  contents: read
+
+# a new push to the same branch cancels the render still in progress
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # the pull request branch itself (not the merge commit), so that the
+      # rendered README.md can be committed back to it
+      - name: Check out branch ⬇️
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Set up R ▶️
+        uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2.14.0
+        with:
+          r-version: 'release'
+          use-public-rspm: true
+
+      # pandoc sets the line wrapping of README.md; its version is the default
+      # of this action, which moves forward with the dependabot updates
+      - name: Set up pandoc
+        uses: r-lib/actions/setup-pandoc@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2.14.0
+
+      - name: Install packages 🔧
+        run: |
+          install.packages(c("rmarkdown", "badger"))
+        shell: Rscript {0}
+
+      - name: Render README 📖
+        run: |
+          rmarkdown::render("inst/README.Rmd", output_file = "README.md", output_dir = getwd())
+        shell: Rscript {0}
+
+      # a pull request from a fork receives a read-only token, so for a fork the
+      # job fails and uploads the rendered README.md for the author to commit;
+      # the commit is created through the GraphQL API, so GitHub signs it as
+      # github-actions[bot] and it shows as Verified
+      - name: Commit README.md
+        id: commit
+        env:
+          BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- README.md; then
+            echo "README.md matches inst/README.Rmd."
+            exit 0
+          fi
+          git --no-pager diff -- README.md
+          if [[ "${HEAD_REPO}" != "${GITHUB_REPOSITORY}" ]]; then
+            echo "::error file=README.md::README.md differs from inst/README.Rmd. Download README.md from the rendered-readme artifact of this run, commit it to the pull request branch and push."
+            exit 1
+          fi
+          if [[ "${BRANCH}" == "master" ]]; then
+            echo "::error file=README.md::README.md differs from inst/README.Rmd. Run the Render README workflow on a new branch and open a pull request."
+            exit 1
+          fi
+          jq -n \
+            --arg repo "${GITHUB_REPOSITORY}" \
+            --arg branch "${BRANCH}" \
+            --arg head "$(git rev-parse HEAD)" \
+            --arg readme "$(base64 -w 0 README.md)" \
+            '{
+              query: "mutation($input: CreateCommitOnBranchInput!) { createCommitOnBranch(input: $input) { commit { url } } }",
+              variables: {input: {
+                branch: {repositoryNameWithOwner: $repo, branchName: $branch},
+                expectedHeadOid: $head,
+                message: {
+                  headline: "docs(readme): render README.md from inst/README.Rmd",
+                  body: "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+                },
+                fileChanges: {additions: [{path: "README.md", contents: $readme}]}
+              }}
+            }' | gh api graphql --input -
+
+      - name: Upload rendered README.md ⬆️
+        if: failure() && steps.commit.outcome == 'failure'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: rendered-readme
+          path: README.md
