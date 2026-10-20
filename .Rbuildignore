@@ -9,7 +9,6 @@ Dockerfile
 ^.*\.rds$
 ^.*\.jpeg$
 
-^\.travis\.yml$
 ^docs$
 README*
 
