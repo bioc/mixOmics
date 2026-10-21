@@ -1,5 +1,5 @@
 
-<!-- PLEASE DO NOT EDIT ./README.md BY HAND, EDIT ./inst/README.Rmd AND RENDER TO CREATE ./README.md -->
+<!-- PLEASE DO NOT EDIT ./README.md BY HAND, EDIT ./inst/README.Rmd AND THE RENDER README WORKFLOW CREATES ./README.md IN THE PULL REQUEST -->
 
 [![download](http://www.bioconductor.org/shields/downloads/release/mixOmics.svg)](https://bioconductor.org/packages/stats/bioc/mixOmics)
 [![R build
@@ -127,7 +127,7 @@ docker run -e PASSWORD=your_password --rm -p 8787:8787 mixomicsteam/mixomics:git
 In your web browser, go to `http://localhost:8787/` (change port if
 necessary) and login with the following credentials:
 
-*username*: rstudio\
+*username*: rstudio  
 *password*: (your_password set in step 4)
 
 6)  Inspect/stop
