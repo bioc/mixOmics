@@ -5,7 +5,7 @@
 #' \eqn{Q^2} for s/PLS methods as a function of the number of components.
 #' 
 #' \code{plot.perf} creates one plot for each response variable in the model,
-#' laid out in a multi-panel display. See ?perf for examples.
+#' laid out in a multi-panel display. See ?perf for more examples.
 #' 
 #' @param x an \code{perf.pls} object.
 #' @param criterion character string. What type of validation criterion to plot
@@ -38,6 +38,7 @@
 #' feature selection and multiple data integration. PLoS Comput Biol 13(11):
 #' e1005752
 #' @keywords regression multivariate hplot
+#' @example ./examples/plot.perf.pls-examples.R
 #' @name plot.perf.pls
 NULL
 ## --------------------------- plot.perf.(s)pls --------------------------- ##
