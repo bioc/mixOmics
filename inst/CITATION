@@ -1,14 +1,21 @@
 citHeader("To cite mixOmics in publications, please use:")
 
-citEntry(entry = "article",
-  author = "Rohart F, Gautier B, Singh A, and Le Cao K-A",
+bibentry(
+  bibtype = "Article",
   title = "mixOmics: An R package for 'omics feature selection and multiple data integration",
-journal="PLoS computational biology",
-  volume="13",
-  number="11",
-  pages="e1005752",
-  year="2017",
-  publisher="Public Library of Science",
-  url = "http://www.mixOmics.org",
-  textVersion = "Rohart F, Gautier B, Singh A, and Le Cao K-A (2017) mixOmics: An R package for 'omics feature selection and multiple data integration. PLoS computational biology 13(11):e1005752"
+  author = c(person("Florian", "Rohart"),
+             person("Beno\u00eet", "Gautier"),
+             person("Amrit", "Singh"),
+             person("Kim-Anh", "L\u00ea Cao")),
+  journal = "PLOS Computational Biology",
+  year = "2017",
+  volume = "13",
+  number = "11",
+  pages = "e1005752",
+  doi = "10.1371/journal.pcbi.1005752",
+  textVersion = paste(
+    "Rohart F, Gautier B, Singh A, L\u00ea Cao K-A (2017)",
+    "mixOmics: An R package for 'omics feature selection and multiple data integration.",
+    "PLoS Comput Biol 13(11): e1005752. https://doi.org/10.1371/journal.pcbi.1005752"
+  )
 )
