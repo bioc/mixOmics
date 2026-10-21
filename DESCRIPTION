@@ -61,8 +61,7 @@ URL: https://mixomics.org
 BugReports: https://github.com/mixOmics-org/mixOmics/issues
 Repository: Bioconductor
 VignetteBuilder: knitr
-Date: 2021-07-15
-Packaged: 2017-02-06 06:49:17 UTC; klecao
+Date: 2026-04-28
 NeedsCompilation: no
 biocViews: ImmunoOncology, 
            Microarray, 
