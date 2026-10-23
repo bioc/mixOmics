@@ -22,7 +22,7 @@ README*
 Library
 
 .github
-ignore
+^buildignore$
 .Renviron
 ^codecov\.yml$
 ^\.github$
